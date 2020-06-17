@@ -13,7 +13,7 @@ function requireAuth(req, res, next) {
     .toString()
     .split(':')
 
-  if(tokenUserName || tokenPassword){
+  if(!tokenUserName || !tokenPassword){
     return res.status(401).json({error:'Unauthorized request'})
   }
 
