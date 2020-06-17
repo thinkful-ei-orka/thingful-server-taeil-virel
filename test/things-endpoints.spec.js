@@ -15,6 +15,13 @@ describe('Things Endpoints', function() {
     const token = Buffer.from(`${user.user_name}:${user.password}`).toString('base64')
     return `Basic ${token}`
   }
+  const protectedEndpoints =[
+  {name:'GET /api/things/:thingsid',
+  path:'/api/things/:1'
+  },
+  {name:'GET /api/things/:thingsid/reviews',
+  path:' /api/things/1/reviews'}
+  ]
   before('make knex instance', () => {
     db = knex({
       client: 'pg',
@@ -88,7 +95,7 @@ describe('Things Endpoints', function() {
       })
     })
   })
-
+  protectedEndpoints.forEach(endpoint=>{
   describe.only(`GET /api/things/:thing_id`, () => {
     context(`Given no things`, () => {
       beforeEach(()=>db.into('thingful_users').insert(testUsers))
@@ -141,7 +148,7 @@ describe('Things Endpoints', function() {
           .set('Authorization', makeAuthHeader(userNoCreds))
           .expect(401, { error: `Unauthorized request` })
       })
-      it(`responds 401 'Unauthorized request' when invalid user`, () => {
+    it(`responds 401 'Unauthorized request' when invalid user`, () => {
         const InvalidCred = {user_name: 'user-not', password: 'yololololo'}
         return supertest(app)
         .get('/api/things/1')
@@ -149,7 +156,13 @@ describe('Things Endpoints', function() {
         .expect(401, {error:'Unauthorized request'})
       })
     })
-
+   it(`responds 401 'Unauthorized request' when invalid password`, () => {
+     const userInvalidPass = { user_name: testUsers[0].user_name, password: 'wrong' }
+     return supertest(app)
+       .get(`/api/things/1`)
+       .set('Authorization', makeAuthHeader(userInvalidPass))
+       .expect(401, { error: `Unauthorized request` })
+    })
     context(`Given an XSS attack thing`, () => {
       const testUser = helpers.makeUsersArray()[1]
       const {
@@ -168,7 +181,7 @@ describe('Things Endpoints', function() {
       it('removes XSS attack content', () => {
         return supertest(app)
           .get(`/api/things/${maliciousThing.id}`)
-          .set('Authorization', makeAuthHeader(testUsers[0]))
+          .set('Authorization', makeAuthHeader(testUsers[1]))
           .expect(200)
           .expect(res => {
             expect(res.body.title).to.eql(expectedThing.title)
@@ -176,6 +189,7 @@ describe('Things Endpoints', function() {
           })
       })
     })
+  })
   })
 
   describe(`GET /api/things/:thing_id/reviews`, () => {
