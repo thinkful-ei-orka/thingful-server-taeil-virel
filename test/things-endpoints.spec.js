@@ -203,7 +203,7 @@ describe.only('Things Endpoints', function() {
       },
       {
         name:'GET /api/things/:thingsid/reviews',
-        path:' /api/things/1/reviews'
+        path:'/api/things/1/reviews'
       }
     ]
 
