@@ -129,8 +129,8 @@ describe('Things Endpoints', function() {
       })
       it('Missing basic authorization', ()=>{
         return supertest(app)
-          .get(`api/things/1`)
-          .expect(401, {error:'MMissing basic token'})
+          .get(`/api/things/1`)
+          .expect(401, {error:'Missing basic token'})
       })
 
       it(`responds 401 'Unauthorized request' when no credentials in token`, () => {
@@ -139,6 +139,13 @@ describe('Things Endpoints', function() {
           .get(`/api/things/1`)
           .set('Authorization', makeAuthHeader(userNoCreds))
           .expect(401, { error: `Unauthorized request` })
+      })
+      it(`responds 401 'Unauthorized request' when invalid user`, () => {
+        const InvalidCred = {user_name: 'user-not', password: 'yololololo'}
+        return supertest(app)
+        .get('/api/things/1')
+        .set('Authorization', makeAuthHeader({ user_name: 'user-not', password: 'existy' }))
+        .expect(401, {error:'Unauthorized request'})
       })
     })
 
