@@ -17,17 +17,17 @@ function requireAuth(req, res, next) {
     return res.status(401).json({error:'Unauthorized request'})
   }
 
-  // req.app.get('db')('thingful_users')
-  //   .where({user_name: tokenUserName})
-  //   .first()
-  //   .then(user=>{
-  //     if(!user){
-  //     return res.status(401).json({error: 'Unauthorized request'})
-  //   }
-  //     next()
-  //   })
-  //   .catch(next)
-  next()
+  req.app.get('db')('thingful_users')
+    .where({user_name: tokenUserName})
+    .first()
+    .then(user=>{
+      if(!user){
+      return res.status(401).json({error: 'Unauthorized request'})
+    }
+      next()
+    })
+    .catch(next)
+  // next()
 }
 
 module.exports = {
